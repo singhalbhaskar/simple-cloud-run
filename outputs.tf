@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,65 @@
  * limitations under the License.
  */
 
-output "service_name" {
-  value       = module.cloud_run.service_name
-  description = "Name of the created service"
+output "id" {
+  description = "The memorystore instance ID."
+  value       = google_redis_instance.default.id
 }
 
-output "revision" {
-  value       = module.cloud_run.revision
-  description = "Deployed revision for the service"
+output "host" {
+  description = "The IP address of the instance."
+  value       = google_redis_instance.default.host
 }
 
-output "service_url" {
-  value       = module.cloud_run.service_url
-  description = "The URL on which the deployed service is available"
+output "port" {
+  description = "The port number of the exposed Redis endpoint."
+  value       = google_redis_instance.default.port
 }
 
-output "service_id" {
-  value       = module.cloud_run.service_id
-  description = "Unique Identifier for the created service"
+output "read_endpoint" {
+  description = " The IP address of the exposed readonly Redis endpoint."
+  value       = google_redis_instance.default.read_endpoint
 }
 
-output "service_status" {
-  value       = module.cloud_run.service_status
-  description = "Status of the created service"
+output "region" {
+  description = "The region the instance lives in."
+  value       = google_redis_instance.default.region
 }
 
-output "service_location" {
-  value       = module.cloud_run.location
-  description = "Location in which the Cloud Run service was created"
+output "current_location_id" {
+  description = "The current zone where the Redis endpoint is placed."
+  value       = google_redis_instance.default.current_location_id
+}
+
+output "persistence_iam_identity" {
+  description = "Cloud IAM identity used by import/export operations. Format is 'serviceAccount:'. May change over time"
+  value       = google_redis_instance.default.persistence_iam_identity
+}
+
+output "auth_string" {
+  description = "AUTH String set on the instance. This field will only be populated if auth_enabled is true."
+  value       = google_redis_instance.default.auth_string
+  sensitive   = true
+}
+
+output "server_ca_certs" {
+  description = "List of server CA certificates for the instance"
+  value       = google_redis_instance.default.server_ca_certs
+  sensitive   = false
+}
+
+output "env_vars" {
+  description = "Exported environment variables"
+  value = {
+    "REDIS_HOST" : google_redis_instance.default.host,
+    "REDIS_PORT" : tostring(google_redis_instance.default.port)
+  }
+}
+
+output "apphub_service_uri" {
+  value = {
+    service_uri = "//redis.googleapis.com/${google_redis_instance.default.id}"
+    service_id  = substr("${var.name}-${md5("${google_redis_instance.default.region}-${var.project_id}")}", 0, 63)
+  }
+  description = "Service URI in CAIS style to be used by Apphub."
 }
